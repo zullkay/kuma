@@ -193,13 +193,10 @@ A possible ``/home/vagrant/src/.env`` file could look like this for example::
 The kuma project
 ----------------
 
-Start by creating a file named ``settings_local.py``, and putting this line in
-it::
+Start by creating a file named ``.env`` in the root folder of your kuma Git
+clone, next to the ``.gitignore`` file.
 
-    from settings import *
-
-Now you can copy and modify any settings from ``settings.py`` into
-``settings_local.py`` and the value will override the default.
+Now you can override a few variables as defined in the ``settings/*`` files.
 
 .. note::
 
@@ -209,36 +206,14 @@ Now you can copy and modify any settings from ``settings.py`` into
 Database
 ~~~~~~~~
 
-At a minimum, you will need to define a database connection. An example
-configuration is::
+At a minimum, you will need to define a database connection. The default
+database configuration is::
 
-    DATABASES = {
-        'default': {
-            'NAME': 'kuma',
-            'ENGINE': 'django.db.backends.mysql',
-            'HOST': 'localhost',
-            'PORT': '3306',
-            'USER': 'kuma',
-            'PASSWORD': 'kuma',
-            'OPTIONS': {
-                'sql_mode': 'TRADITIONAL',
-                'charset': 'utf8',
-                'init_command': 'SET '
-                    'storage_engine=INNODB,'
-                    'character_set_connection=utf8,'
-                    'collation_connection=utf8_general_ci',
-            },
-            'ATOMIC_REQUESTS': True,
-            'TEST': {
-                'CHARSET': 'utf8',
-                'COLLATION': 'utf8_general_ci',
-            },
-        },
-    }
+    DATABASE_URL = 'mysql://kuma:kuma@localhost:3306/kuma'
 
-Note the two values ``CHARSET`` and ``COLLATION`` of the ``TEST`` setting.
-Without these, the test suite will use MySQL's (moronic) defaults when
-creating the test database (see below) and lots of tests will fail. Hundreds.
+In other words, it uses MySQL default, the username and password of 'kuma'
+when trying to access the database 'kuma'. We automatically use MySQL's InnoDB
+storage engine if configured.
 
 Once you've set up the database, you can generate the schema with Django's
 ``migrate`` command::
@@ -250,16 +225,14 @@ This will generate an empty database, which will get you started!
 Assets
 ~~~~~~
 
-If you want to see images and have the pages formatted with CSS you need to
-set your ``settings_local.py`` with the following::
+Kuma will automatically run in debug mode, with the ``DEBUG`` setting
+turned to ``True``. That will make it serve images and have the pages
+formatted with CSS automatically.
 
-    DEBUG = True
-    TEMPLATE_DEBUG = DEBUG
-    SERVE_MEDIA = True
+Setting ``DEBUG = false`` in your ``.env`` file will put the installation
+in production mode and ask for minified assets.
 
-Setting ``DEBUG = False`` will put the installation in production mode
-and ask for minified assets. In that case, you will need to generate
-CSS from stylus and compress resource::
+In that case, you will need to generate CSS from stylus and compress resource::
 
     ./scripts/compile-stylesheets
     ./manage.py compress_assets
@@ -326,24 +299,20 @@ Now you can sign in with GitHub at https://developer-local.allizom.org/
 Persona Auth
 ~~~~~~~~~~~~
 
-Add the following to ``settings_local.py`` so that Persona works with the
+Add the following to your ``.env`` file so that Persona works with the
 development instance::
 
     SITE_URL = 'http://localhost:8000'
     PROTOCOL = 'http://'
     DOMAIN = 'localhost'
-    PORT = 8000
-    SESSION_COOKIE_SECURE = False # needed if the server is running on http://
-    SESSION_EXPIRE_AT_BROWSER_CLOSE = False
-
-The ``SESSION_EXPIRE_AT_BROWSER_CLOSE`` setting is not strictly necessary, but
-it's convenient for development.
+    # only needed if the server is running on http:// (default)
+    SESSION_COOKIE_SECURE = false
 
 Secure Cookies
 ~~~~~~~~~~~~~~
 
-To prevent error messages like ``Forbidden (CSRF cookie not set.):``, you need to
-set your ``settings_local.py`` with the following::
+To prevent error messages like ``Forbidden (CSRF cookie not set.):``,
+you need to set your ``.env`` file with the following::
 
     CSRF_COOKIE_SECURE = False
 
@@ -354,10 +323,10 @@ To start the dev server, run ``./manage.py runserver``, then open up
 ``http://localhost:8000``. If everything's working, you should see
 the MDN home page!
 
-You might need to first set ``LC_CTYPE`` if you're on Mac OS X until
-`bug 754728 <https://bugzilla.mozilla.org/show_bug.cgi?id=754728>`_ is fixed::
+You might need to first set ``LC_CTYPE`` in your ``.env`` file if you're on
+Mac OS X until `bug 754728 <https://bugzil.la/754728>`_ is fixed::
 
-    export LC_CTYPE=en_US
+    LC_CTYPE = "en_US"
 
 Create an admin user
 --------------------

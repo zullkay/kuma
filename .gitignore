@@ -3,7 +3,6 @@
 *.sw?
 .vagrant
 kuma.box
-settings_local.py
 pip-log.txt
 .coverage
 coverage.xml
@@ -36,4 +35,5 @@ james.ini
 celeryev.pid
 media/js/libs/ckeditor/source/ckbuilder
 .tox
+uploads/
 .env

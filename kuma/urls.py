@@ -1,7 +1,6 @@
-from django.conf.urls import include, url
 from django.conf import settings
+from django.conf.urls import include, url
 from django.contrib import admin
-from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.shortcuts import redirect
 from django.views.i18n import javascript_catalog
 from django.views.decorators.cache import cache_page
@@ -48,8 +47,7 @@ urlpatterns = [
     # Javascript translations.
     url(r'^jsi18n/.*$',
         cache_page(60 * 60 * 24 * 365)(javascript_catalog),
-        {'domain': 'javascript',
-         'packages': [settings.ROOT_PACKAGE]},
+        {'domain': 'javascript', 'packages': ['kuma']},
         name='jsi18n'),
 
     url(r'^files/', include('kuma.attachments.urls')),
@@ -74,9 +72,6 @@ urlpatterns = [
         handler500,
         name='users.honeypot'),
 ]
-
-if settings.DEBUG:
-    urlpatterns += staticfiles_urlpatterns()
 
 if settings.SERVE_MEDIA:
     media_url = settings.MEDIA_URL.lstrip('/').rstrip('/')
