@@ -4,8 +4,10 @@ from elasticsearch_dsl import document, field
 from elasticsearch_dsl.mapping import Mapping
 
 from django.contrib.auth.models import User
+from django.db.models import Min
 
 from kuma.users.models import UserBan
+from kuma.wiki.models import Revision
 
 
 INDEX = 'mdn-metrics'
@@ -53,7 +55,7 @@ class TotalUsers(BaseMetricDocType):
 
     class Meta(object):
         mapping = Mapping('total_users')
-        mapping.meta('_all', enalbed=False)
+        mapping.meta('_all', enabled=False)
 
     @classmethod
     def fetch_data(cls, date):
@@ -68,7 +70,7 @@ class NewUsers(BaseMetricDocType):
 
     class Meta(object):
         mapping = Mapping('new_users')
-        mapping.meta('_all', enalbed=False)
+        mapping.meta('_all', enabled=False)
 
     @classmethod
     def fetch_data(cls, date):
@@ -85,7 +87,7 @@ class NewBans(BaseMetricDocType):
 
     class Meta(object):
         mapping = Mapping('new_bans')
-        mapping.meta('_all', enalbed=False)
+        mapping.meta('_all', enabled=False)
 
     @classmethod
     def fetch_data(cls, date):
@@ -98,7 +100,31 @@ class NewBans(BaseMetricDocType):
         }
 
 
+class NewFirstEditors(BaseMetricDocType):
+
+    class Meta(object):
+        mapping = Mapping('first_editors')
+        mapping.meta('_all', enabled=False)
+
+    @classmethod
+    def fetch_data(cls, date):
+        first_editors = []
+        start = date
+        end = date + datetime.timedelta(days=1)
+        day_editors = (Revision.objects
+                           .filter(created__range=(start, end))
+                           .only('creator')
+                           .select_related('creator')
+                           .values_list('creator', flat=True)
+                           .distinct())
+        for pk in day_editors:
+            oldest_edit = Revision.objects.filter(creator__pk=pk).aggregate(Min('created'))
+            if oldest_edit['created__min'] >= start:
+                first_editors.append(pk)
+        count = len(first_editors)
+        return {
+            'count': count,
+        }
 # TODO:
-# no. of first revisions (from MDN)
 # no. of contributors (from MDN) (anyone who has authored a revision in last 30 days)
 # no. contributions (number of overall revisions)
