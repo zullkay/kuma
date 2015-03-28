@@ -1,12 +1,13 @@
 import datetime
 from django.conf import settings
-import googleanalytics as ga
 
 
 def user_count(days=1):
     """
     Fetch the number of users on MDN for the given number of days
     """
+    import googleanalytics as ga
+
     accounts = ga.authenticate(**settings.GOOGLE_ANALYTICS_CREDENTIALS)
     account = accounts[0]
 
