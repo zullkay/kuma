@@ -480,6 +480,7 @@ INSTALLED_APPS = (
     'kuma.users',
     'kuma.wiki',
     'kuma.attachments',
+    'kuma.metrics',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',

@@ -8,6 +8,9 @@ from django.contrib.auth.models import User
 from kuma.users.models import UserBan
 
 
+INDEX = 'mdn-metrics'
+
+
 class BaseMetricDocType(document.DocType):
     date = field.Date(format='date')
     count = field.Long()
