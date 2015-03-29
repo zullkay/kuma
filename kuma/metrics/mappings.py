@@ -145,7 +145,7 @@ class NewFirstEditors(BaseMetricDocType):
         for pk in day_editors:
             oldest_edit = (Revision.objects.filter(creator__pk=pk)
                                            .aggregate(Min('created')))
-            if oldest_edit['created__min'] >= start:
+            if oldest_edit['created__min'].date() >= start:
                 first_editors.append(pk)
         count = len(first_editors)
         yield {
