@@ -14,22 +14,14 @@ from django.utils.translation import ugettext_lazy as _
 from celery import chain
 from elasticsearch.helpers import bulk
 from elasticsearch_dsl import document, field
-from elasticsearch_dsl.connections import connections
 from elasticsearch_dsl.mapping import Mapping
 from elasticsearch_dsl.search import Search
 
 from kuma.core.utils import chord_flow, chunked
+from kuma.search.connections import connections
 
 
 log = logging.getLogger('kuma.wiki.search')
-
-
-# Configure Elasticsearch connections for connection pooling.
-connections.configure(
-    default={'hosts': settings.ES_URLS},
-    indexing={'hosts': settings.ES_URLS,
-              'timeout': settings.ES_INDEXING_TIMEOUT},
-)
 
 
 class WikiDocumentType(document.DocType):

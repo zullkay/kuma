@@ -3,7 +3,7 @@ import datetime
 from celery.task import task
 
 from kuma.metrics.mappings import BaseMetricDocType, INDEX
-from kuma.metrics.connection import connection as es
+from kuma.search.connections import es
 
 
 @task
