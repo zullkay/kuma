@@ -153,6 +153,26 @@ class NewFirstEditors(BaseMetricDocType):
             'count': count,
         }
 
+
+class NewRevisions(BaseMetricDocType):
+    """
+    Count number of new revisions per day.
+    """
+
+    class Meta(object):
+        mapping = Mapping('new_revisions')
+        mapping.meta('_all', enabled=False)
+
+    @classmethod
+    def build_document(cls, date):
+        start = date
+        end = date + datetime.timedelta(days=1)
+        count = (Revision.objects.filter(is_approved=True,
+                                         created__range=(start, end)).count())
+        yield {
+            'date': date.isoformat(),
+            'count': count,
+        }
+
 # TODO:
 # no. of contributors (from MDN) (anyone who has authored a revision in last 30 days)
-# no. contributions (number of overall revisions)
