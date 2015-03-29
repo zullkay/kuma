@@ -4,9 +4,9 @@ from optparse import make_option
 from django.core.management.base import BaseCommand, CommandError
 from elasticsearch.exceptions import NotFoundError
 
-from kuma.metrics.connection import connection as es
 from kuma.metrics.mappings import BaseMetricDocType, INDEX
 from kuma.metrics.tasks import index_metrics
+from kuma.search.connections import es
 
 
 class Command(BaseCommand):
