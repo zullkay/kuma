@@ -163,8 +163,10 @@ class NewRevisions(BaseMetricDocType):
     def build_document(cls, date):
         start = date
         end = date + datetime.timedelta(days=1)
-        count = (Revision.objects.filter(is_approved=True,
-                                         created__range=(start, end)).count())
+        count = (Revision.objects.filter(created__range=(start, end))
+                                 .filter(creator__is_active=True)
+                                 .exclude(creator__bans__is_active=True)
+                                 .count())
         yield {
             'date': date.isoformat(),
             'count': count,
