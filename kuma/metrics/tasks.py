@@ -15,5 +15,5 @@ def index_metrics(date_str):
     date = datetime.datetime.strptime(date_str, '%Y-%m-%d').date()
 
     for mapping in BaseMetricDocType.__subclasses__():
-        doc = mapping.build_document(date)
-        es.index(index=INDEX, doc_type=mapping._doc_type.name, body=doc)
+        for doc in mapping.build_document(date):
+            es.index(index=INDEX, doc_type=mapping._doc_type.name, body=doc)
