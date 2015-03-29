@@ -4,7 +4,7 @@ from elasticsearch_dsl import document, field
 from elasticsearch_dsl.mapping import Mapping
 
 from django.contrib.auth.models import User
-from django.db.models import Count, Min
+from django.db.models import Min
 
 from kuma.users.models import UserBan, UserProfile
 from kuma.wiki.models import Revision
@@ -68,17 +68,13 @@ class TotalUsers(BaseMetricDocType):
 
     @classmethod
     def build_document(cls, date):
-        counts = (
-            UserProfile.objects.filter(user__is_active=True,
-                                       user__date_joined__lte=date)
-                               .values_list('locale')
-                               .annotate(locales=Count('locale'))).iterator()
-        for count in counts:
-            yield {
-                'date': date.isoformat(),
-                'count': count[1],
-                'locale': count[0],
-            }
+        count = (UserProfile.objects.filter(user__is_active=True,
+                                            user__date_joined__lte=date)
+                                    .count())
+        yield {
+            'date': date.isoformat(),
+            'count': count,
+        }
 
 
 class NewUsers(BaseMetricDocType):
