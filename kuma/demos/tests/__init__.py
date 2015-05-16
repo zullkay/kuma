@@ -1,6 +1,5 @@
-import datetime
-
 from django.contrib.auth import get_user_model
+from django.utils import timezone
 
 from ..models import Submission
 
@@ -17,7 +16,7 @@ def make_users():
 
 
 def build_submission(creator):
-    now = str(datetime.datetime.now())
+    now = str(timezone.now())
 
     s = Submission(title='Hello world' + now, slug='hello-world' + now,
                    description='This is a hello world demo', hidden=False,
@@ -28,7 +27,7 @@ def build_submission(creator):
 
 
 def build_hidden_submission(creator, slug='hidden-world'):
-    now = str(datetime.datetime.now())
+    now = str(timezone.now())
 
     s = Submission(title='Hidden submission 1' + now, slug=slug + now,
                    description='This is a hidden demo', hidden=True,

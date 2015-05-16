@@ -11,6 +11,7 @@ from nose.plugins.attrib import attr
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.test.utils import override_settings
+from django.utils import timezone
 
 from constance import config
 from waffle.models import Switch
@@ -732,7 +733,7 @@ class GetCurrentOrLatestRevisionTests(UserTestCase):
     def test_latest(self):
         """Return latest revision when no current exists."""
         r1 = revision(is_approved=False, save=True,
-                      created=datetime.now() - timedelta(days=1))
+                      created=timezone.now() - timedelta(days=1))
         r2 = revision(is_approved=False, save=True, document=r1.document)
         eq_(r2, r1.document.current_or_latest_revision())
 
@@ -954,7 +955,7 @@ class DeferredRenderingTests(UserTestCase):
     def test_one_render_at_a_time(self, mock_kumascript_get):
         """Only one in-progress rendering should be allowed for a Document"""
         mock_kumascript_get.return_value = (self.rendered_content, None)
-        self.d1.render_started_at = datetime.now()
+        self.d1.render_started_at = timezone.now()
         self.d1.save()
         try:
             self.d1.render('', 'http://testserver/')
@@ -971,7 +972,7 @@ class DeferredRenderingTests(UserTestCase):
         mock_kumascript_get.return_value = (self.rendered_content, None)
         timeout = 5.0
         config.KUMA_DOCUMENT_RENDER_TIMEOUT = timeout
-        self.d1.render_started_at = (datetime.now() -
+        self.d1.render_started_at = (timezone.now() -
                                      timedelta(seconds=timeout + 1))
         self.d1.save()
         try:
@@ -1095,7 +1096,7 @@ class RenderExpiresTests(UserTestCase):
     """Tests for max-age and automatic document rebuild"""
 
     def test_find_stale_documents(self):
-        now = datetime.now()
+        now = timezone.now()
 
         # Fresh
         d1 = document(title='Aged 1')
@@ -1122,7 +1123,7 @@ class RenderExpiresTests(UserTestCase):
         mock_kumascript_get.return_value = ('MOCK CONTENT', None)
 
         max_age = 1000
-        now = datetime.now()
+        now = timezone.now()
 
         d1 = document(title='Aged 1')
         d1.render_max_age = max_age
@@ -1139,7 +1140,7 @@ class RenderExpiresTests(UserTestCase):
     def test_update_expires_without_max_age(self, mock_kumascript_get):
         mock_kumascript_get.return_value = ('MOCK CONTENT', None)
 
-        now = datetime.now()
+        now = timezone.now()
         d1 = document(title='Aged 1')
         d1.render_expires = now - timedelta(seconds=100)
         d1.save()
@@ -1154,7 +1155,7 @@ class RenderExpiresTests(UserTestCase):
                           mock_kumascript_get):
         mock_kumascript_get.return_value = ('MOCK CONTENT', None)
 
-        now = datetime.now()
+        now = timezone.now()
         earlier = now - timedelta(seconds=1000)
 
         d1 = document(title='Aged 3')

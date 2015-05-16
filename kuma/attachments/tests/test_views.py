@@ -5,6 +5,7 @@ from nose.tools import eq_, ok_
 from django.conf import settings
 from django.core.files.base import ContentFile
 from django.core.files import temp as tempfile
+from django.utils import timezone
 from django.utils.http import parse_http_date_safe
 
 from constance import config
@@ -61,7 +62,7 @@ class AttachmentTests(UserTestCase, WikiTestCase):
             a = Attachment(title=f['title'], slug=f['slug'],
                            mindtouch_attachment_id=f['file_id'])
             a.save()
-            now = datetime.datetime.now()
+            now = timezone.now()
             r = AttachmentRevision(
                 attachment=a,
                 mime_type='text/plain',
@@ -203,7 +204,7 @@ class AttachmentTests(UserTestCase, WikiTestCase):
             slug=a.slug,
             description='',
             comment='Initial revision.',
-            created=datetime.datetime.now() - datetime.timedelta(seconds=30),
+            created=timezone.now() - datetime.timedelta(seconds=30),
             creator=test_user,
             is_approved=True)
         r.file.save('get_previous_test_file.txt',
@@ -218,7 +219,7 @@ class AttachmentTests(UserTestCase, WikiTestCase):
             slug=a.slug,
             description='',
             comment='First edit..',
-            created=datetime.datetime.now(),
+            created=timezone.now(),
             creator=test_user,
             is_approved=True)
         r2.file.save('get_previous_test_file.txt',
@@ -245,7 +246,7 @@ class AttachmentTests(UserTestCase, WikiTestCase):
             slug=a.slug,
             description='',
             comment='Initial revision.',
-            created=datetime.datetime.now() - datetime.timedelta(seconds=30),
+            created=timezone.now() - datetime.timedelta(seconds=30),
             creator=test_user,
             is_approved=True)
         r.file.save('mime_type_filter_test_file.txt',
