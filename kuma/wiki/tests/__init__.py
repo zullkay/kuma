@@ -1,4 +1,3 @@
-from datetime import datetime
 import time
 
 from django.contrib.auth import get_user_model
@@ -33,7 +32,7 @@ def document(save=False, **kwargs):
     """Return an empty document with enough stuff filled out that it can be
     saved."""
     defaults = {'category': Document.CATEGORIES[0][0],
-                'title': unicode(datetime.now()),
+                'title': unicode(timezone.now()),
                 'is_redirect': 0}
     defaults.update(kwargs)
     if 'slug' not in kwargs:

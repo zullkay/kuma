@@ -628,7 +628,7 @@ class Document(NotificationsMixin, models.Model):
         else:
             tags = list(self.tags.values_list('name', flat=True))
 
-        now_iso = datetime.now().isoformat()
+        now_iso = timezone.now().isoformat()
 
         if self.modified:
             modified = self.modified.isoformat()
