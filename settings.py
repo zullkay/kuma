@@ -5,7 +5,6 @@ import logging
 import os
 import platform
 
-from django.utils.functional import lazy
 from django.utils.translation import ugettext_lazy as _
 from django.core.urlresolvers import reverse_lazy
 

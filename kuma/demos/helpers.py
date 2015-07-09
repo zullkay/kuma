@@ -4,12 +4,8 @@ import hashlib
 import random
 
 from babel import localedata
-import jinja2
-
 from django.conf import settings
-from django.utils import timezone
-from django.utils.timezone import get_default_timezone
-
+import jinja2
 import jingo
 from jingo import register
 from tower import ungettext, ugettext as _

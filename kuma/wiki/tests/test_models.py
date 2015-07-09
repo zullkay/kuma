@@ -1,5 +1,5 @@
 from cStringIO import StringIO
-from datetime import date, datetime, timedelta
+from datetime import date, timedelta
 import json
 import time
 from xml.sax.saxutils import escape

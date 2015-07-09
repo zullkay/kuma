@@ -2,7 +2,7 @@ import hashlib
 import json
 import sys
 import traceback
-from datetime import datetime, timedelta
+from datetime import timedelta
 from urlparse import urlparse
 
 try:

@@ -23,7 +23,6 @@ from django.template import defaultfilters
 from django.utils.encoding import smart_str, force_text
 from django.utils.html import strip_tags
 from django.utils.safestring import mark_safe
-from django.utils.timezone import get_default_timezone
 
 from soapbox.models import Message
 from statici18n.utils import get_filename
