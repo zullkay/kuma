@@ -9,17 +9,16 @@ from babel import localedata
 from babel.dates import format_date, format_time, format_datetime
 from babel.numbers import format_decimal
 import bleach
-import pytz
 from urlobject import URLObject
 from jingo import register, env
 import jinja2
-from pytz import timezone
 from tower import ugettext_lazy as _lazy, ungettext
 
 from django.conf import settings
 from django.contrib.messages.storage.base import LEVEL_TAGS
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.template import defaultfilters
+from django.utils import timezone
 from django.utils.encoding import smart_str, force_text
 from django.utils.html import strip_tags
 from django.utils.safestring import mark_safe
@@ -192,19 +191,6 @@ def level_tag(message):
                                     strings_only=True))
 
 
-@register.filter
-def isotime(t):
-    """Date/Time format according to ISO 8601"""
-    if not hasattr(t, 'tzinfo'):
-        return
-    return _append_tz(t).astimezone(pytz.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-
-
-def _append_tz(t):
-    tz = pytz.timezone(settings.TIME_ZONE)
-    return tz.localize(t)
-
-
 @register.function
 def thisyear():
     """The current year."""
@@ -295,41 +281,44 @@ def datetimeformat(context, value, format='shortdatetime', output='html'):
     if not isinstance(value, datetime.datetime):
         if isinstance(value, datetime.date):
             # Turn a date into a datetime
-            value = datetime.datetime.combine(value,
+            today = datetime.datetime.combine(value,
                                               datetime.datetime.min.time())
+            value = timezone.make_aware(today, timezone.get_default_timezone())
         else:
             # Expecting datetime value
             raise ValueError
-
-    default_tz = timezone(settings.TIME_ZONE)
-    tzvalue = default_tz.localize(value)
 
     user = context['request'].user
     try:
         if user.is_authenticated() and user.profile.timezone:
             user_tz = user.profile.timezone
-            tzvalue = user_tz.normalize(tzvalue.astimezone(user_tz))
+            value = user_tz.normalize(value.astimezone(user_tz))
     except AttributeError:
         pass
 
     locale = _babel_locale(_contextual_locale(context))
 
+    format_params = {
+        'locale': locale,
+        'tzinfo': value.tzinfo,
+    }
+
     # If within a day, 24 * 60 * 60 = 86400s
     if format == 'shortdatetime':
         # Check if the date is today
-        if value.toordinal() == datetime.date.today().toordinal():
-            formatted = _lazy(u'Today at %s') % format_time(
-                tzvalue, format='short', locale=locale)
+        if value.toordinal() == timezone.now().toordinal():
+            formatted_time = format_time(value, format='short', **format_params)
+            formatted = _lazy(u'Today at %s') % formatted_time
         else:
-            formatted = format_datetime(tzvalue, format='short', locale=locale)
+            formatted = format_datetime(value, format='short', **format_params)
     elif format == 'longdatetime':
-        formatted = format_datetime(tzvalue, format='long', locale=locale)
+        formatted = format_datetime(value, format='long', **format_params)
     elif format == 'date':
-        formatted = format_date(tzvalue, locale=locale)
+        formatted = format_date(value, locale=locale)
     elif format == 'time':
-        formatted = format_time(tzvalue, locale=locale)
+        formatted = format_time(value, **format_params)
     elif format == 'datetime':
-        formatted = format_datetime(tzvalue, locale=locale)
+        formatted = format_datetime(value, **format_params)
     else:
         # Unknown format
         raise DateTimeFormatError
@@ -337,7 +326,7 @@ def datetimeformat(context, value, format='shortdatetime', output='html'):
     if output == 'json':
         return formatted
     return jinja2.Markup('<time datetime="%s">%s</time>' %
-                         (tzvalue.isoformat(), formatted))
+                         (value.isoformat(), formatted))
 
 
 @register.function
