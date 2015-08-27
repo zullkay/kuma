@@ -1188,6 +1188,15 @@ PERSONA_INCLUDE_URL = 'https://login.persona.org/include.js'
 
 HONEYPOT_FIELD_NAME = 'website'
 
+BLOCKABLE_USER_AGENTS = [
+    "Yahoo! Slurp",
+    "Googlebot",
+    "bingbot",
+    "Applebot",
+    "wget",
+    "curl",
+]
+
 # TODO: Once using DRF more we need to make that exception handler more generic
 REST_FRAMEWORK = {
     'EXCEPTION_HANDLER': 'kuma.search.utils.search_exception_handler'
